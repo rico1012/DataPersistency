@@ -60,7 +60,7 @@ public class Main {
     private static void testAdresDAO(AdresDAO adao){
         System.out.println("\n----------- Test AdresDAO --------------");
         List<Adres> adressen = adao.findAll();
-        System.out.println("[Test] AdresDAO.findAll() geeft de volgende reizigers:");
+        System.out.println("[Test] AdresDAO.findAll() geeft de volgende adressen:");
         for (Adres a : adressen){
             System.out.println(a);
         }
