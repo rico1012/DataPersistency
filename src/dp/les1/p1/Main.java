@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args){
-        String url = "jdbc:postgresql://localhost/ovchip?user=postgres&password=*****";
+        String url = "jdbc:postgresql://localhost/ovchip?user=postgres&password=";
 
         try{
             Connection conn = DriverManager.getConnection(url);

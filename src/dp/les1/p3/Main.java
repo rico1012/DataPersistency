@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String url = "jdbc:postgresql://localhost/ovchip?user=postgres&password=******";
+        String url = "jdbc:postgresql://localhost/ovchip?user=postgres&password=";
 
         try {
             Connection conn = DriverManager.getConnection(url);
@@ -71,6 +71,11 @@ public class Main {
         System.out.print("[Test] Eerst " + adressen.size() + " adressen, na AdressDAO.save() ");
         adao.save(a1);
         adressen=adao.findAll();
+        System.out.println(adressen.size() + " adressen\n");
+        System.out.println();
+        System.out.println("[Test] AdresDAO.delete() geeft de volgende hoeveelheid");
+        adao.delete(a1);
+        adressen = adao.findAll();
         System.out.println(adressen.size() + " adressen\n");
     }
 }

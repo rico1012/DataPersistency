@@ -30,6 +30,7 @@ public class AdresDAOsql implements AdresDAO {
         rs.close();
         return true;
     }catch (SQLException e){
+
         return false;
     }
     }
@@ -43,7 +44,7 @@ public class AdresDAOsql implements AdresDAO {
     public boolean delete(Adres adres) {
         try{
             String query;
-            query = "DELETE FROM adres WHERE adres_id=? AND postcode=? AND huisnummer=? AND straat=? AND reiziger_id=? AND geboortedatum=?) ";
+            query = "DELETE FROM adres WHERE adres_id=?::integer AND postcode=? AND huisnummer=? AND straat=? AND woonplaats=? AND reiziger_id=?::integer";
             System.out.println("");
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setInt(1, adres.getId());
@@ -56,6 +57,7 @@ public class AdresDAOsql implements AdresDAO {
             rs.close();
             return true;
         }catch (SQLException e){
+            System.out.println(e);
             return false;
         }
     }
