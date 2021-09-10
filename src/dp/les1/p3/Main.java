@@ -20,7 +20,7 @@ public class Main {
             for(Reiziger r : reizigerDAOPsql.findAll()){
                 Adres a = adresDAOsql.findByReiziger(r);
                 if (a!=null){
-                    r.setAdres_id(a.getId());
+                    r.setAdres(a);
                     System.out.println(r+a.toString());
                 }else {
                     System.out.println(r);

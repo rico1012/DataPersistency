@@ -8,7 +8,7 @@ public class Reiziger {
     private String tussenvoegsel;
     private String achternaam;
     private Date geboortedatum;
-    private int adres_id;
+    private Adres adres;
 
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum) {
         this.id = id;
@@ -58,12 +58,14 @@ public class Reiziger {
         this.geboortedatum = geboortedatum;
     }
 
-    public int getAdres_id() {
-        return adres_id;
+
+
+    public Adres getAdres() {
+        return adres;
     }
 
-    public void setAdres_id(int adres_id) {
-        this.adres_id = adres_id;
+    public void setAdres(Adres adres) {
+        this.adres = adres;
     }
 
     @Override
@@ -74,7 +76,7 @@ public class Reiziger {
                 ", tussenvoegsel='" + tussenvoegsel + '\'' +
                 ", achternaam='" + achternaam + '\'' +
                 ", geboortedatum=" + geboortedatum +
-                ", adres_id='" + adres_id + '\'' +
+                ", adres=" + adres +
                 '}';
     }
 }
