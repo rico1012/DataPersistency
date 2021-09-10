@@ -37,8 +37,26 @@ public class AdresDAOsql implements AdresDAO {
 
     @Override
     public boolean update(Adres adres) {
-        return false;
+        try {
+            String query;
+            query = "UPDATE adres SET postcode=?, huisnummer=?, straat=?, woonplaats=?, reiziger_id=? WHERE adres_id=?";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, adres.getPostcode());
+            pst.setString(2, adres.getHuisnummer());
+            pst.setString(3, adres.getStraat());
+            pst.setString(4, adres.getWoonplaats());
+            pst.setInt(5, adres.getReiziger_id());
+            pst.setInt(6, adres.getId());
+            pst.executeUpdate();
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            System.out.println(throwables);
+
+            return false;
+        }
     }
+
 
     @Override
     public boolean delete(Adres adres) {

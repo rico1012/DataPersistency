@@ -20,7 +20,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     public boolean save(dp.les1.p3.Reiziger reiziger) throws SQLException {
         try{
             String query;
-            query = "INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum) " +
+            query = "INSERT INTO reiziger (reiziger_id::integer , voorletters, tussenvoegsel, achternaam, geboortedatum::date ) " +
                     "VALUES (?,?,?,?,?)";
             System.out.println("");
             PreparedStatement pst = conn.prepareStatement(query);
@@ -39,7 +39,21 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     @Override
     public boolean update(dp.les1.p3.Reiziger reiziger) {
-        return false;
+        try {
+            String query;
+            query = "UPDATE reiziger SET voorletters=? , tussenvoegsel=? achternaam=? geboortedatum=? WHERE reiziger_id=?";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, reiziger.getVoorletters());
+            pst.setString(2, reiziger.getTussenvoegsel());
+            pst.setString(3, reiziger.getAchternaam());
+            pst.setDate(4, (Date) reiziger.getGeboortedatum());
+            pst.setInt(5, reiziger.getId());
+            pst.executeUpdate();
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -139,7 +153,13 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 gd = rs.getString("gd");
                 java.util.Date date1= new SimpleDateFormat("yyyy-MMdd").parse(gd);
                 Reiziger r = new Reiziger(Integer.parseInt(rid),vl,tv,an, date1);
+                for (Adres adres : new AdresDAOsql(conn).findAll()){
+                    if (adres.getReiziger_id()==Integer.parseInt(rid)){
+                        r.setAdres(adres);
+                    }
+                }
                 reizigerList.add(r);
+
             }
             rs.close();
             sta.close();
