@@ -14,7 +14,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     public boolean save(OVChipkaart ovChipkaart) {
         try{
             String query;
-            query = "INSERT INTO ovchipkaart (kaart_nummer::integer , geldig_toch::date , klasse::integer , saldo::numeric , reiziger_id::integer ) " +
+            query = "INSERT INTO ov_chipkaart (kaart_nummer::integer , geldig_toch::date , klasse::integer , saldo::numeric , reiziger_id::integer ) " +
                     "VALUES (?,?,?,?,?)";
             System.out.println("");
             PreparedStatement pst = connection.prepareStatement(query);
@@ -33,12 +33,41 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
 
     @Override
     public boolean update(OVChipkaart ovChipkaart) {
-        return false;
+        try {
+            String query;
+            query = "UPDATE ov_chipkaart SET reiziger_id=? , geldig_tot=?, klasse=?, saldo=? WHERE kaart_nummer=?";
+            PreparedStatement pst = connection.prepareStatement(query);
+            pst.setInt(5, ovChipkaart.getKaartNummer());
+            pst.setDate(2, (java.sql.Date) ovChipkaart.getGeldigTot());
+            pst.setInt(3, ovChipkaart.getKlasse());
+            pst.setInt(4, ovChipkaart.getSaldo());
+            pst.setInt(1, ovChipkaart.getReiziger().getId());
+            pst.executeUpdate();
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean delete(OVChipkaart ovChipkaart) {
-        return false;
+        try{
+            String query;
+            query = "DELETE FROM ov_chipkaart WHERE kaart_nummer=? AND geldig_tot=? AND klasse=? AND saldo=? AND reiziger_id=?) ";
+            System.out.println("");
+            PreparedStatement pst = connection.prepareStatement(query);
+            pst.setInt(1, ovChipkaart.getKaartNummer());
+            pst.setDate(2, (java.sql.Date) ovChipkaart.getGeldigTot());
+            pst.setInt(3, ovChipkaart.getKlasse());
+            pst.setInt(4, ovChipkaart.getSaldo());
+            pst.setInt(5, ovChipkaart.getReiziger().getId());
+            ResultSet rs = pst.executeQuery();
+            rs.close();
+            return true;
+        }catch (SQLException e){
+            return false;
+        }
     }
 
     @Override
