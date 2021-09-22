@@ -16,6 +16,7 @@ public class Main {
             getConnection();
             testReizigerDAO(new ReizigerDAOPsql(conn));
             testAdresDAO(new AdresDAOsql(conn));
+            testOVChipDOA(new OVChipkaartDAOsql(conn));
             closeConnection();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -104,10 +105,9 @@ public class Main {
         for (Reiziger reiziger : new ReizigerDAOPsql(conn).findAll()){
             System.out.println(reiziger);
         }
-        System.out.println();
+        System.out.println()
 
-
-
+        ;
         //adres delete test
         System.out.println("[Test] AdresDAO.delete() geeft de volgende hoeveelheid");
         adao.delete(a2);
@@ -117,7 +117,16 @@ public class Main {
         for (Adres a : adressen){
             System.out.println(a);
         }
-
-
+    }
+    private static void testOVChipDOA(OVChipkaartDAO ovChipkaartDAO){
+        System.out.println();
+        System.out.println("\n--------- Test OVchipdao ------------");
+        System.out.println();
+        List<OVChipkaart> ovChipkaartList = ovChipkaartDAO.findAll();
+        System.out.println("[Test] ov chipkaart find all:");
+        for (OVChipkaart ovChipkaart : ovChipkaartList){
+            System.out.println(ovChipkaart);
+        }
+        System.out.println("[Test] ov chipkaart delete");
     }
 }

@@ -6,9 +6,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class OVChipkaartDAOsql implements OVChipkaartDAO{
     private Connection connection;
+
+    public OVChipkaartDAOsql(Connection connection) {
+        this.connection = connection;
+    }
 
     @Override
     public boolean save(OVChipkaart ovChipkaart) {
@@ -21,7 +26,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             pst.setInt(1, ovChipkaart.getKaartNummer());
             pst.setDate(2, (java.sql.Date) ovChipkaart.getGeldigTot());
             pst.setInt(3, ovChipkaart.getKlasse());
-            pst.setInt(4, ovChipkaart.getSaldo());
+            pst.setDouble(4, ovChipkaart.getSaldo());
             pst.setInt(5, ovChipkaart.getReiziger().getId());
             ResultSet rs = pst.executeQuery();
             rs.close();
@@ -40,7 +45,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             pst.setInt(5, ovChipkaart.getKaartNummer());
             pst.setDate(2, (java.sql.Date) ovChipkaart.getGeldigTot());
             pst.setInt(3, ovChipkaart.getKlasse());
-            pst.setInt(4, ovChipkaart.getSaldo());
+            pst.setDouble(4, ovChipkaart.getSaldo());
             pst.setInt(1, ovChipkaart.getReiziger().getId());
             pst.executeUpdate();
             return true;
@@ -60,10 +65,13 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             pst.setInt(1, ovChipkaart.getKaartNummer());
             pst.setDate(2, (java.sql.Date) ovChipkaart.getGeldigTot());
             pst.setInt(3, ovChipkaart.getKlasse());
-            pst.setInt(4, ovChipkaart.getSaldo());
+            pst.setDouble(4, ovChipkaart.getSaldo());
             pst.setInt(5, ovChipkaart.getReiziger().getId());
             ResultSet rs = pst.executeQuery();
             rs.close();
+            for(Reiziger reiziger : (new ReizigerDAOPsql(connection)).findAll()){
+                reiziger.getOvChipkaartList().remove(ovChipkaart);
+            }
             return true;
         }catch (SQLException e){
             return false;
@@ -87,7 +95,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             saldo = rs.getString("saldo");
             rs.close();
             Date date = new SimpleDateFormat("MM-dd-yyyy").parse(geldigTot);
-            return new OVChipkaart(Integer.parseInt(kaartNummer), date,Integer.parseInt(klasse), Integer.parseInt(saldo), reiziger);
+            return new OVChipkaart(Integer.parseInt(kaartNummer), date,Integer.parseInt(klasse), Double.parseDouble(saldo), reiziger);
         } else {
             rs.close();
             return null;
@@ -117,13 +125,23 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
                 rs.close();
                 Date date = new SimpleDateFormat("MM-dd-yyyy").parse(geldigTot);
                 Reiziger reiziger = null;
-                for (Reiziger reiziger1 : (new ReizigerDAOPsql(connection)).findAll()){
+                List<Reiziger> reizigers = new ReizigerDAOPsql(connection).findAll();
+                for (Reiziger reiziger1 : reizigers){
                     if (reiziger1.getId()==Integer.parseInt(reizigerId)){
                         reiziger=reiziger1;
                     }
                 }
-                OVChipkaart ovChipkaart = new OVChipkaart(Integer.parseInt(kaartNummer), date,Integer.parseInt(klasse), Integer.parseInt(saldo), reiziger);
+                OVChipkaart ovChipkaart = new OVChipkaart(Integer.parseInt(kaartNummer), date,Integer.parseInt(klasse), Double.parseDouble(saldo), reiziger);
                 ovChipkaartList.add(ovChipkaart);
+
+                for (Reiziger reiziger1 : reizigers){
+                    if (reiziger1.getId()==Integer.parseInt(reizigerId)){
+                        if (reiziger1.getOvChipkaartList()==null){
+                            reiziger.setOvChipkaartList(new ArrayList<>());
+                        }
+                        reiziger1.getOvChipkaartList().add(ovChipkaart);
+                    }
+                }
             }
             rs.close();
             sta.close();

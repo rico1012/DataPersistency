@@ -52,15 +52,17 @@ ALTER TABLE medewerkers ADD geslacht varchar(1) CONSTRAINT m_geslacht_chk CHECK 
 -- START TRANSACTION;
 
 
-SET CONSTRAINTS m_afd_fk DEFERRED;
+
 
 INSERT INTO medewerkers (mnr, naam, voorl, functie, chef, gbdatum, maandsal, comm, afd, geslacht)
-VALUES (8000, 'DONK', 'A', 'DIRECTEUR', 7839, '12-01-2003', 8000, 400, 50, 'M');
+VALUES (8000, 'DONK', 'A', 'DIRECTEUR', 7839, '12-01-2003', 8000, 400, NULL, 'M');
 
 INSERT INTO afdelingen (anr, naam, locatie, hoofd)
 VALUES (50, 'ONDERZOEK', 'ZWOLLE', 8000);
 
--- COMMIT;
+UPDATE medewerkers SET afd=50 WHERE mnr=8000;
+
+-- -- COMMIT;
 
 
 
@@ -76,20 +78,19 @@ VALUES (50, 'ONDERZOEK', 'ZWOLLE', 8000);
 --      nummers van 3 cijfers. Los dit probleem op.
 
 CREATE SEQUENCE afdeling_nummer_seq
-	INCREMENT 10
-	START 60
-	MINVALUE 60
-	MAXVALUE 3927613876128
-	CACHE 1;
+INCREMENT 10
+ START 60
+ MINVALUE 60
+ MAXVALUE 3927613876128
+ CACHE 1;
 	
-INSERT INTO afdelingen (anr, naam, locatie, hoofd)
-VALUES (afdeling_nummer_seq.NEXTVAL 'CALLCENTER', 'ZWOLLE', 8000);
-
+ INSERT INTO afdelingen (anr, naam, locatie, hoofd)
+ VALUES (afdeling_nummer_seq.NEXTVAL 'CALLCENTER', 'ZWOLLE', 8000);
 INSERT INTO afdelingen (anr, naam, locatie, hoofd)
 VALUES (afdeling_nummer_seq.NEXTVAL 'MAGAZIJN', 'ZWOLLE', 8000);
 
-ALTER TABLE afdelingen
-ALTER COLUMN anr NUMERIC(3);
+ ALTER TABLE afdelingen
+ ALTER COLUMN anr NUMERIC(3);
 	
 
 	
@@ -109,14 +110,14 @@ ALTER COLUMN anr NUMERIC(3);
 CREATE TABLE adressen
 (
 postcode	VARCHAR(6)	CONSTRAINT ad_pk	PRIMARY KEY
-							CONSTRAINT ad_gtnr_chk	CHECK (postcode LIKE '[A-Z][A-Z][A-Z][A-Z][0-9][0-9]'),
-huisnummer	NUMERIC(3)	CONSTRAINT ad_pk	NOT NULL,
-ingangsdatum	DATE	CONSTRAINT ad_pk	NOT NULL,
-einddatum	DATE	CONSTRAINT ad_bfr_chk	CHECK (einddatum>ingangsdatum),
-telefoon	NUMERIC(10)	CONSTRAINT ad_unq_chk	UNIQUE,
-med_mnr	NUMERIC(4)	CONSTRAINT ad_med_fk	REFERENCES medewerkers DEFERRABLE
- 						CONSTRAINT ad_nnl_chk	NOT NULL
-);
+ 							CONSTRAINT ad_gtnr_chk	CHECK (postcode LIKE '[A-Z][A-Z][A-Z][A-Z][0-9][0-9]'),
+ huisnummer	NUMERIC(3)	CONSTRAINT ad_pk	NOT NULL,
+ ingangsdatum	DATE	CONSTRAINT ad_pk	NOT NULL,
+ einddatum	DATE	CONSTRAINT ad_bfr_chk	CHECK (einddatum>ingangsdatum),
+ telefoon	NUMERIC(10)	CONSTRAINT ad_unq_chk	UNIQUE,
+ med_mnr	NUMERIC(4)	CONSTRAINT ad_med_fk	REFERENCES medewerkers DEFERRABLE
+  						CONSTRAINT ad_nnl_chk	NOT NULL
+ );
 
 
 -- S1.5. Commissie
@@ -125,16 +126,16 @@ med_mnr	NUMERIC(4)	CONSTRAINT ad_med_fk	REFERENCES medewerkers DEFERRABLE
 -- 'VERKOPER' heeft, anders moet de commissie NULL zijn. Schrijf hiervoor een beperkingsregel. Gebruik onderstaande
 -- 'illegale' INSERTs om je beperkingsregel te controleren.
 
-ALTER TABLE medewerkers
-ALTER COLUMN comm SET DEFAULT null;
+-- ALTER TABLE medewerkers
+-- ALTER COLUMN comm SET DEFAULT null;
 
--- ALTER COLUMN comm	NUMERIC(6, 2)	ADD CONSTRAINT v_def_def	DEFAULT NULL;
+-- -- ALTER COLUMN comm	NUMERIC(6, 2)	ADD CONSTRAINT v_def_def	DEFAULT NULL;
 
-INSERT INTO medewerkers (mnr, naam, voorl, functie, chef, gbdatum, maandsal, comm)
-VALUES (8001, 'MULLER', 'TJ', 'TRAINER', 7566, '1982-08-18', 2000, 500);
+-- INSERT INTO medewerkers (mnr, naam, voorl, functie, chef, gbdatum, maandsal, comm)
+-- VALUES (8001, 'MULLER', 'TJ', 'TRAINER', 7566, '1982-08-18', 2000, 500);
 
-INSERT INTO medewerkers (mnr, naam, voorl, functie, chef, gbdatum, maandsal, comm)
-VALUES (8002, 'JANSEN', 'M', 'VERKOPER', 7698, '1981-07-17', 1000, NULL);
+-- INSERT INTO medewerkers (mnr, naam, voorl, functie, chef, gbdatum, maandsal, comm)
+-- VALUES (8002, 'JANSEN', 'M', 'VERKOPER', 7698, '1981-07-17', 1000, NULL);
 
 
 
