@@ -6,6 +6,9 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.Format;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class Main {
@@ -18,7 +21,7 @@ public class Main {
             testAdresDAO(new AdresDAOsql(conn));
             testOVChipDOA(new OVChipkaartDAOsql(conn));
             closeConnection();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ParseException throwables) {
             throwables.printStackTrace();
         }
     }
@@ -68,6 +71,11 @@ public class Main {
         for (Adres a : adressen){
             System.out.println(a);
         }
+
+
+
+
+
         System.out.println();
 
         Adres a1 = new Adres(80, "3648CN", "178H", "jansenstraat", "Maarsen", 77);
@@ -118,15 +126,41 @@ public class Main {
             System.out.println(a);
         }
     }
-    private static void testOVChipDOA(OVChipkaartDAO ovChipkaartDAO){
+    private static void testOVChipDOA(OVChipkaartDAO ovChipkaartDAO) throws ParseException, SQLException {
         System.out.println();
         System.out.println("\n--------- Test OVchipdao ------------");
         System.out.println();
-        List<OVChipkaart> ovChipkaartList = ovChipkaartDAO.findAll();
         System.out.println("[Test] ov chipkaart find all:");
-        for (OVChipkaart ovChipkaart : ovChipkaartList){
+        for (OVChipkaart ovChipkaart : ovChipkaartDAO.findAll()){
             System.out.println(ovChipkaart);
         }
+        System.out.println();
+        System.out.println("[Test] ov chipkaart add:");
+        String gbdatum = "1981-03-14";
+        Reiziger sietske = new Reiziger( "S", "", "Boers", Date.valueOf(gbdatum));
+        sietske.setId(77);
+        OVChipkaart ovChipkaart = new OVChipkaart(21, Date.valueOf(gbdatum), 03,32.5, sietske );
+        ovChipkaartDAO.save(ovChipkaart);
+        for (OVChipkaart ovChipkaart1 : ovChipkaartDAO.findAll()){
+            System.out.println(ovChipkaart1);
+        }
+        System.out.println();
+        System.out.println("[Test] ov chipkaart update");
+        String gbdatum2 = "2019-07-24";
+        OVChipkaart ovChipkaartupdate = new  OVChipkaart(21, Date.valueOf(gbdatum2), 06, 69, sietske);
+        ovChipkaartDAO.update(ovChipkaartupdate);
+        for (OVChipkaart ovChipkaart1 : ovChipkaartDAO.findAll()){
+            System.out.println(ovChipkaart1);
+        }
+        System.out.println();
+        System.out.println("[Test] ov chipkaart findByReiziger");
+        System.out.println("find by reiziger: "+ sietske);
+        System.out.println(ovChipkaartDAO.findByReiziger(sietske));
+        System.out.println();
         System.out.println("[Test] ov chipkaart delete");
+        ovChipkaartDAO.delete(ovChipkaartupdate);
+        for (OVChipkaart ovChipkaart1 : ovChipkaartDAO.findAll()){
+            System.out.println(ovChipkaart1);
+        }
     }
 }

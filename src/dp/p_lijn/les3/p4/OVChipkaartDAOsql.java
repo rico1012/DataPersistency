@@ -19,7 +19,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     public boolean save(OVChipkaart ovChipkaart) {
         try{
             String query;
-            query = "INSERT INTO ov_chipkaart (kaart_nummer::integer , geldig_toch::date , klasse::integer , saldo::numeric , reiziger_id::integer ) " +
+            query = "INSERT INTO ov_chipkaart (kaart_nummer , geldig_tot , klasse , saldo , reiziger_id ) " +
                     "VALUES (?,?,?,?,?)";
             System.out.println("");
             PreparedStatement pst = connection.prepareStatement(query);
@@ -32,6 +32,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             rs.close();
             return true;
         }catch (SQLException e){
+            System.out.println(e);
             return false;
         }
     }
@@ -59,7 +60,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     public boolean delete(OVChipkaart ovChipkaart) {
         try{
             String query;
-            query = "DELETE FROM ov_chipkaart WHERE kaart_nummer=? AND geldig_tot=? AND klasse=? AND saldo=? AND reiziger_id=?) ";
+            query = "DELETE FROM ov_chipkaart WHERE kaart_nummer=? AND geldig_tot=? AND klasse=? AND saldo=? AND reiziger_id=? ";
             System.out.println("");
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, ovChipkaart.getKaartNummer());
@@ -70,7 +71,9 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             ResultSet rs = pst.executeQuery();
             rs.close();
             for(Reiziger reiziger : (new ReizigerDAOPsql(connection)).findAll()){
-                reiziger.getOvChipkaartList().remove(ovChipkaart);
+                if (reiziger.equals(ovChipkaart.getReiziger())){
+                    reiziger.getOvChipkaartList().remove(ovChipkaart);
+                }
             }
             return true;
         }catch (SQLException e){
@@ -107,22 +110,19 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
         try{
             Statement sta = connection.createStatement();
             String query = "SELECT kaart_nummer AS kaartNummer, geldig_tot AS geldigTot, klasse AS klasse, saldo AS saldo, reiziger_id AS reizigerId FROM ov_chipkaart";
-
             ResultSet rs = sta.executeQuery(query);
-
             String kaartNummer;
             String geldigTot;
             String klasse;
             String saldo;
             String reizigerId;
             List<OVChipkaart> ovChipkaartList= new ArrayList<>();
-            if (rs.next()) {
+            while (rs.next()) {
                 kaartNummer = rs.getString("kaartNummer");
                 geldigTot = rs.getString("geldigTot");
                 klasse = rs.getString("klasse");
                 saldo = rs.getString("saldo");
                 reizigerId = rs.getString("reizigerId");
-                rs.close();
                 Date date = new SimpleDateFormat("MM-dd-yyyy").parse(geldigTot);
                 Reiziger reiziger = null;
                 List<Reiziger> reizigers = new ReizigerDAOPsql(connection).findAll();
@@ -142,6 +142,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
                         reiziger1.getOvChipkaartList().add(ovChipkaart);
                     }
                 }
+
             }
             rs.close();
             sta.close();

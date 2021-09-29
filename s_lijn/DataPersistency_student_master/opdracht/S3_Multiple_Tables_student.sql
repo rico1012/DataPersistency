@@ -69,7 +69,7 @@ DROP VIEW IF EXISTS s3_5; CREATE OR REPLACE VIEW s3_5 AS    -- [TEST]
 SELECT medewerkers.naam
 FROM uitvoeringen
 JOIN inschrijvingen ON uitvoeringen.cursus = inschrijvingen.cursus 
-JOIN medewerkers ON medewerkers.mnr = inschrijvingen.cursist WHERE inschrijvingen.begindatum = '04-12-2019' AND uitvoeringen.cursus = 'S02';
+JOIN medewerkers ON medewerkers.mnr = inschrijvingen.cursist WHERE inschrijvingen.begindatum = make_date(2019,04,12) AND uitvoeringen.cursus = 'S02';
 
 
 -- S3.6.

@@ -30,7 +30,7 @@ public class AdresDAOsql implements AdresDAO {
         rs.close();
         return true;
     }catch (SQLException e){
-
+        System.out.println(e);
         return false;
     }
     }
