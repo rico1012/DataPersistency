@@ -1,5 +1,6 @@
 package dp.p_lijn.les3.p4;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +18,8 @@ public class Reiziger {
         this.tussenvoegsel = tussenvoegsel;
         this.achternaam = achternaam;
         this.geboortedatum = geboortedatum;
+        this.setOvChipkaartList(new ArrayList<>());
+
     }
 
     public int getId() {

@@ -20,7 +20,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     public boolean save(Reiziger reiziger) throws SQLException {
         try{
             String query;
-            query = "INSERT INTO reiziger (reiziger_id::integer , voorletters, tussenvoegsel, achternaam, geboortedatum::date ) " +
+            query = "INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum) " +
                     "VALUES (?,?,?,?,?)";
             System.out.println("");
             PreparedStatement pst = conn.prepareStatement(query);
@@ -33,6 +33,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             rs.close();
             return true;
         }catch (SQLException e){
+            OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(conn);
+            for (OVChipkaart ovChipkaart: reiziger.getOvChipkaartList()){
+                ovChipkaartDAO.save(ovChipkaart);
+            }
+            System.out.println(e);
             return false;
         }
     }
@@ -41,7 +46,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     public boolean update(Reiziger reiziger) {
         try {
             String query;
-            query = "UPDATE reiziger SET voorletters=? , tussenvoegsel=? achternaam=? geboortedatum=? WHERE reiziger_id=?";
+            query = "UPDATE reiziger SET voorletters=? , tussenvoegsel=? ,achternaam=? ,geboortedatum=? WHERE reiziger_id=?";
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, reiziger.getVoorletters());
             pst.setString(2, reiziger.getTussenvoegsel());
@@ -52,6 +57,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             return true;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+
             return false;
         }
     }
@@ -72,6 +78,10 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             rs.close();
             return true;
         }catch (SQLException e){
+            OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(conn);
+            for (OVChipkaart ovChipkaart: reiziger.getOvChipkaartList()){
+                ovChipkaartDAO.delete(ovChipkaart);
+            }
             return false;
         }
     }
@@ -128,6 +138,14 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             r.setId(Integer.parseInt(rid));
             reizigers.add(r);
         }
+        for (OVChipkaart ovChipkaart : (new OVChipkaartDAOsql(conn).findAll())){
+            for (Reiziger reiziger : reizigers){
+                if (ovChipkaart.getReiziger().equals(reiziger)){
+                    reiziger.getOvChipkaartList().add(ovChipkaart);
+                }
+            }
+        }
+
         rs.close();
         pst.close();
         return reizigers;

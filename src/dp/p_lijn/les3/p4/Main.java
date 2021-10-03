@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -61,6 +62,20 @@ public class Main {
         System.out.println(reizigers.size() + " reizigers\n");
 
         // Voeg aanvullende tests van de ontbrekende CRUD-operaties in.
+        Reiziger reiziger = new Reiziger("R", "", "Vossestein", Date.valueOf(gbdatum));
+        reiziger.setId(89);
+        for (int i = 0; i < 1000; i++) {
+            OVChipkaart ovChipkaart = new OVChipkaart(1000+i,Date.valueOf(gbdatum), 2, 60,reiziger);
+            reiziger.getOvChipkaartList().add(ovChipkaart);
+        }
+        rdao.save(reiziger);
+        System.out.println(reiziger.getOvChipkaartList().size());
+        reiziger.getOvChipkaartList().remove(0);
+        rdao.update(reiziger);
+        System.out.println(reiziger.getOvChipkaartList().size());
+
+
+
     }
 
     private static void testAdresDAO(AdresDAO adao) throws SQLException {
