@@ -39,7 +39,7 @@ public class Main {
         conn.close();
     }
 
-    private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
+    private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException, ParseException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
         // Haal alle reizigers op uit de database
@@ -86,13 +86,7 @@ public class Main {
         for (Adres a : adressen){
             System.out.println(a);
         }
-
-
-
-
-
         System.out.println();
-
         Adres a1 = new Adres(80, "3648CN", "178H", "jansenstraat", "Maarsen", 77);
         //adres save test
         System.out.print("[Test] Eerst " + adressen.size() + " adressen, na AdressDAO.save() ");
@@ -128,9 +122,7 @@ public class Main {
         for (Reiziger reiziger : new ReizigerDAOPsql(conn).findAll()){
             System.out.println(reiziger);
         }
-        System.out.println()
-
-        ;
+        System.out.println();
         //adres delete test
         System.out.println("[Test] AdresDAO.delete() geeft de volgende hoeveelheid");
         adao.delete(a2);

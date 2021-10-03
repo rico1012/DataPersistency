@@ -1,6 +1,8 @@
 package dp.p_lijn.les3.p4;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class OVChipkaart {
     private int kaartNummer;
@@ -8,6 +10,7 @@ public class OVChipkaart {
     private int klasse;
     private double saldo;
     private Reiziger reiziger;
+    private List<Product> producten;
 
     public OVChipkaart(int kaartNummer, Date geldigTot, int klasse, double saldo, Reiziger reiziger) {
         this.kaartNummer = kaartNummer;
@@ -15,6 +18,15 @@ public class OVChipkaart {
         this.klasse = klasse;
         this.saldo = saldo;
         this.reiziger = reiziger;
+        this.producten = new ArrayList<>();
+    }
+
+    public List<Product> getProducten() {
+        return producten;
+    }
+
+    public void setProducten(List<Product> producten) {
+        this.producten = producten;
     }
 
     public int getKaartNummer() {

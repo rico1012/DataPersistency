@@ -43,7 +43,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     }
 
     @Override
-    public boolean update(Reiziger reiziger) {
+    public boolean update(Reiziger reiziger) throws SQLException, ParseException {
         try {
             String query;
             query = "UPDATE reiziger SET voorletters=? , tussenvoegsel=? ,achternaam=? ,geboortedatum=? WHERE reiziger_id=?";
@@ -57,7 +57,18 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             return true;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-
+            OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(conn);
+            List<OVChipkaart> ovChipkaartList = new ArrayList<>((ovChipkaartDAO.findByReiziger(reiziger)));
+            List<OVChipkaart> ovChipkaartList2 = new ArrayList<>(reiziger.getOvChipkaartList());
+            ovChipkaartList.remove(ovChipkaartList2);
+            for (OVChipkaart ovChipkaart : ovChipkaartList){
+                ovChipkaartDAO.delete(ovChipkaart);
+            }
+            List<OVChipkaart> ovChipkaartList3 = new ArrayList<>((ovChipkaartDAO.findByReiziger(reiziger)));
+            ovChipkaartList2.remove(ovChipkaartList3);
+            for (OVChipkaart ovChipkaart : ovChipkaartList2){
+                ovChipkaartDAO.save(ovChipkaart);
+            }
             return false;
         }
     }

@@ -8,7 +8,7 @@ public interface ReizigerDAO {
 
     boolean save(Reiziger reiziger) throws SQLException;
 
-    boolean update(Reiziger reiziger);
+    boolean update(Reiziger reiziger) throws SQLException, ParseException;
 
     boolean delete(Reiziger reiziger);
 

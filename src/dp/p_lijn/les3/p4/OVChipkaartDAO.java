@@ -12,7 +12,7 @@ public interface OVChipkaartDAO {
 
     boolean delete(OVChipkaart ovChipkaart);
 
-    OVChipkaart findByReiziger(Reiziger reiziger) throws SQLException, ParseException;
+    List<OVChipkaart> findByReiziger(Reiziger reiziger) throws SQLException, ParseException;
 
     List<OVChipkaart> findAll();
 }

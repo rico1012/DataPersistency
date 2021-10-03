@@ -82,7 +82,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     }
 
     @Override
-    public OVChipkaart findByReiziger(Reiziger reiziger) throws SQLException, ParseException {
+    public List<OVChipkaart> findByReiziger(Reiziger reiziger) throws SQLException, ParseException {
         String query = "SELECT kaart_nummer AS kaartNummer, geldig_tot AS geldigTot, klasse AS klasse, saldo AS saldo FROM ov_chipkaart WHERE reiziger_id=?";
         PreparedStatement pst = connection.prepareStatement(query);
         pst.setInt(1, reiziger.getId());
@@ -91,6 +91,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
         String geldigTot;
         String klasse;
         String saldo;
+        List<OVChipkaart> ovChipkaartList = new ArrayList<>();
         if (rs.next()) {
             kaartNummer = rs.getString("kaartNummer");
             geldigTot = rs.getString("geldigTot");
@@ -98,11 +99,12 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             saldo = rs.getString("saldo");
             rs.close();
             Date date = new SimpleDateFormat("MM-dd-yyyy").parse(geldigTot);
-            return new OVChipkaart(Integer.parseInt(kaartNummer), date,Integer.parseInt(klasse), Double.parseDouble(saldo), reiziger);
-        } else {
-            rs.close();
-            return null;
+            ovChipkaartList.add(new OVChipkaart(Integer.parseInt(kaartNummer), date,Integer.parseInt(klasse), Double.parseDouble(saldo), reiziger));
         }
+        rs.close();
+        return ovChipkaartList;
+
+
     }
 
     @Override
