@@ -1,5 +1,6 @@
 package dp.p_lijn.les3.p4;
 
+import javax.sound.sampled.Port;
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class ProductDAOsql implements ProductDAO{
             OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(connection);
             for (OVChipkaart ovChipkaart: product.getOvChipkaarten()){
                 ovChipkaartDAO.save(ovChipkaart);
-                String query = "INSERT INTO ov_chipkaar_product (kaart_nummer,product_nummer, status, last_update) " +
+                String query = "INSERT INTO ov_chipkaart_product (kaart_nummer,product_nummer, status, last_update) " +
                         "VALUES (?,?,?,?)";
                 PreparedStatement pst = connection.prepareStatement(query);
                 pst.setInt(1, ovChipkaart.getKaartNummer());
@@ -141,21 +142,59 @@ public class ProductDAOsql implements ProductDAO{
         } else {
             rs.close();
         }
+        OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(connection);
+        for (Product product: producten){
+            String query2 = "SELECT kaart_nummer AS kn FROM ov_chipkaar_product WHERE product.nummer=?";
+            PreparedStatement pst2 = connection.prepareStatement(query2);
+            pst2.setInt(1, product.getProduct_nummer());
+            ResultSet rs2 = pst.executeQuery();
+            List<OVChipkaart> ovChipkaarts = new ArrayList<>();
+            while (rs2.next()) {
+                String kn = rs2.getString("kn");
+                for (OVChipkaart ovChipkaart2: ovChipkaartDAO.findAll()){
+                    if (ovChipkaart2.getKaartNummer()==Integer.parseInt(kn)){
+                        ovChipkaarts.add(ovChipkaart2);
+                    }
+                }
+            }
+            product.setOvChipkaarten(ovChipkaarts);
+            rs2.close();
+            pst2.close();
+        }
+
         return producten;
     }
     public List<Product> findAll() throws SQLException {
-        String query = "SELECT product.product_nummer AS pn, product.naam AS nm, product.beschrijving AS bs, product.prijs AS ps FROM producten";
-        PreparedStatement pst = connection.prepareStatement(query);
-        ResultSet rs = pst.executeQuery();
+        Statement sta = connection.createStatement();
+        String query = "SELECT product_nummer AS pn, naam AS nm, beschrijving AS bs, prijs AS ps FROM product";
+        ResultSet rs = sta.executeQuery(query);
         List<Product> producten = new ArrayList<>();
-        if (rs.next()) {
+        while (rs.next()) {
             String product_nummer = rs.getString("pn");
             String naam = rs.getString("nm");
             String beschrijving = rs.getString("bs");
             String prijs = rs.getString("ps");
             producten.add(new Product(Integer.parseInt(product_nummer),naam,beschrijving,Double.parseDouble(prijs)));
-        } else {
-            rs.close();
+        }
+        rs.close();
+        OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(connection);
+        for (Product product: producten){
+            String query2 = "SELECT kaart_nummer FROM ov_chipkaart_product WHERE product_nummer=?";
+            PreparedStatement pst2 = connection.prepareStatement(query2);
+            pst2.setInt(1, product.getProduct_nummer());
+            ResultSet rs2 = pst2.executeQuery();
+            List<OVChipkaart> ovChipkaarts = new ArrayList<>();
+            while (rs2.next()) {
+                String kn = rs2.getString("kaart_nummer");
+                for (OVChipkaart ovChipkaart2: ovChipkaartDAO.findAll()){
+                    if (ovChipkaart2.getKaartNummer()==Integer.parseInt(kn)){
+                        ovChipkaarts.add(ovChipkaart2);
+                    }
+                }
+            }
+            product.setOvChipkaarten(ovChipkaarts);
+            rs2.close();
+            pst2.close();
         }
         return producten;
     }

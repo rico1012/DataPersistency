@@ -27,11 +27,16 @@ public class Product {
 
     @Override
     public String toString() {
+        List<Integer> ovchipkaarten = new ArrayList<>();
+        for (OVChipkaart ovChipkaart : this.ovChipkaarten){
+            ovchipkaarten.add(ovChipkaart.getKaartNummer());
+        }
         return "product{" +
                 "product_nummer=" + product_nummer +
                 ", naam='" + naam + '\'' +
                 ", beschrijving='" + beschrijving + '\'' +
-                ", prijs=" + prijs +
+                ", prijs=" + prijs + '\'' +
+                ", ovchipkaarten="+ovchipkaarten+
                 '}';
     }
 

@@ -21,7 +21,6 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             String query;
             query = "INSERT INTO ov_chipkaart (kaart_nummer , geldig_tot , klasse , saldo , reiziger_id ) " +
                     "VALUES (?,?,?,?,?)";
-            System.out.println("");
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, ovChipkaart.getKaartNummer());
             pst.setDate(2, (java.sql.Date) ovChipkaart.getGeldigTot());
@@ -32,7 +31,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             rs.close();
             return true;
         }catch (SQLException e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -60,14 +59,9 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     public boolean delete(OVChipkaart ovChipkaart) {
         try{
             String query;
-            query = "DELETE FROM ov_chipkaart WHERE kaart_nummer=? AND geldig_tot=? AND klasse=? AND saldo=? AND reiziger_id=? ";
-            System.out.println("");
+            query = "DELETE FROM ov_chipkaart WHERE kaart_nummer=? ";
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, ovChipkaart.getKaartNummer());
-            pst.setDate(2, (java.sql.Date) ovChipkaart.getGeldigTot());
-            pst.setInt(3, ovChipkaart.getKlasse());
-            pst.setDouble(4, ovChipkaart.getSaldo());
-            pst.setInt(5, ovChipkaart.getReiziger().getId());
             ResultSet rs = pst.executeQuery();
             rs.close();
             for(Reiziger reiziger : (new ReizigerDAOPsql(connection)).findAll()){
@@ -144,11 +138,9 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
                         reiziger1.getOvChipkaartList().add(ovChipkaart);
                     }
                 }
-
             }
             rs.close();
             sta.close();
-
             return ovChipkaartList;
         } catch (SQLException | ParseException throwables) {
             throwables.printStackTrace();

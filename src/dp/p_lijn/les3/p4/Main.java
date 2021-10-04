@@ -21,6 +21,7 @@ public class Main {
             testReizigerDAO(new ReizigerDAOPsql(conn));
             testAdresDAO(new AdresDAOsql(conn));
             testOVChipDOA(new OVChipkaartDAOsql(conn));
+            testProductDOA(new ProductDAOsql(conn));
             closeConnection();
         } catch (SQLException | ParseException throwables) {
             throwables.printStackTrace();
@@ -73,6 +74,7 @@ public class Main {
         reiziger.getOvChipkaartList().remove(0);
         rdao.update(reiziger);
         System.out.println(reiziger.getOvChipkaartList().size());
+        rdao.delete(reiziger);
 
 
 
@@ -169,5 +171,17 @@ public class Main {
         for (OVChipkaart ovChipkaart1 : ovChipkaartDAO.findAll()){
             System.out.println(ovChipkaart1);
         }
+    }
+
+    private static void testProductDOA(ProductDAO productDAO) throws SQLException {
+        System.out.println();
+        System.out.println("\n--------- Test ProductDAO ------------");
+        System.out.println();
+        System.out.println("[Test] Product find all:");
+        for (Product product : productDAO.findAll()){
+            System.out.println(product);
+        }
+        System.out.println();
+        System.out.println("[Test] Product find save:");
     }
 }
