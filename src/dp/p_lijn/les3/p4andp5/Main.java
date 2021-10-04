@@ -1,15 +1,11 @@
-package dp.p_lijn.les3.p4;
+package dp.p_lijn.les3.p4andp5;
 
 
-import java.security.PublicKey;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.text.Format;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -182,6 +178,6 @@ public class Main {
             System.out.println(product);
         }
         System.out.println();
-        System.out.println("[Test] Product find save:");
+        System.out.println("[Test] Product save:");
     }
 }

@@ -1,4 +1,4 @@
-package dp.p_lijn.les3.p4;
+package dp.p_lijn.les3.p4andp5;
 
 import java.sql.*;
 import java.text.ParseException;
@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class OVChipkaartDAOsql implements OVChipkaartDAO{
     private Connection connection;

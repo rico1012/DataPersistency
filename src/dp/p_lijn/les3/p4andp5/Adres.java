@@ -1,4 +1,4 @@
-package dp.p_lijn.les3.p4;
+package dp.p_lijn.les3.p4andp5;
 
 public class Adres {
     private int id;
