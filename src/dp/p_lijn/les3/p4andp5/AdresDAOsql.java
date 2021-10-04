@@ -73,6 +73,7 @@ public class AdresDAOsql implements AdresDAO {
             rs.close();
             return true;
         }catch (SQLException e){
+
             return false;
         }
     }

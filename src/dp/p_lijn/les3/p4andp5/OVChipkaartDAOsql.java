@@ -4,6 +4,7 @@ import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     }
 
     @Override
-    public boolean save(OVChipkaart ovChipkaart) {
+    public boolean save(OVChipkaart ovChipkaart) throws SQLException {
         try{
             String query;
             query = "INSERT INTO ov_chipkaart (kaart_nummer , geldig_tot , klasse , saldo , reiziger_id ) " +
@@ -28,8 +29,27 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
             pst.setInt(5, ovChipkaart.getReiziger().getId());
             ResultSet rs = pst.executeQuery();
             rs.close();
+            ReizigerDAO reizigerDAO = new ReizigerDAOPsql(connection);
+            if (!reizigerDAO.findAll().contains(ovChipkaart.getReiziger())){
+                reizigerDAO.save(ovChipkaart.getReiziger());
+            }
+            ProductDAO productDAO = new ProductDAOsql(connection);
+            for (Product product : ovChipkaart.getProducten()){
+                if (!productDAO.findAll().contains(product)){
+                    productDAO.save(product);
+                    PreparedStatement pst2 = connection.prepareStatement("INSERT INTO ov_chipkaart_product (kaart_nummer,product_nummer, status, last_update) VALUES (?,?,?,?)");
+                    pst2.setInt(1, ovChipkaart.getKaartNummer());
+                    pst2.setInt(2, product.getProduct_nummer());
+                    pst2.setString(3, "actief");
+                    pst2.setDate(4, (java.sql.Date) Calendar.getInstance().getTime());
+                    ResultSet rs2 = pst2.executeQuery();
+                    rs2.close();
+                }
+            }
             return true;
         }catch (SQLException e){
+            System.out.println(e);
+
 
             return false;
         }

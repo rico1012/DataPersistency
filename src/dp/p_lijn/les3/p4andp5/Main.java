@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -61,14 +62,14 @@ public class Main {
         // Voeg aanvullende tests van de ontbrekende CRUD-operaties in.
         Reiziger reiziger = new Reiziger("R", "", "Vossestein", Date.valueOf(gbdatum));
         reiziger.setId(89);
-        for (int i = 0; i < 1000; i++) {
-            OVChipkaart ovChipkaart = new OVChipkaart(1000+i,Date.valueOf(gbdatum), 2, 60,reiziger);
-            reiziger.getOvChipkaartList().add(ovChipkaart);
-        }
-        rdao.save(reiziger);
-        System.out.println(reiziger.getOvChipkaartList().size());
-        reiziger.getOvChipkaartList().remove(0);
-        rdao.update(reiziger);
+//        for (int i = 0; i < 1000; i++) {
+//            OVChipkaart ovChipkaart = new OVChipkaart(1000+i,Date.valueOf(gbdatum), 2, 60,reiziger);
+//            reiziger.getOvChipkaartList().add(ovChipkaart);
+//        }
+//        rdao.save(reiziger);
+//        System.out.println(reiziger.getOvChipkaartList().size());
+//        reiziger.getOvChipkaartList().remove(0);
+//        rdao.update(reiziger);
         System.out.println(reiziger.getOvChipkaartList().size());
         rdao.delete(reiziger);
 
@@ -143,7 +144,7 @@ public class Main {
         System.out.println("[Test] ov chipkaart add:");
         String gbdatum = "1981-03-14";
         Reiziger sietske = new Reiziger( "S", "", "Boers", Date.valueOf(gbdatum));
-        sietske.setId(77);
+        sietske.setId(78);
         OVChipkaart ovChipkaart = new OVChipkaart(21, Date.valueOf(gbdatum), 03,32.5, sietske );
         ovChipkaartDAO.save(ovChipkaart);
         for (OVChipkaart ovChipkaart1 : ovChipkaartDAO.findAll()){
@@ -179,5 +180,35 @@ public class Main {
         }
         System.out.println();
         System.out.println("[Test] Product save:");
+        List<OVChipkaart> ovChipkaartList = new ArrayList<>();
+        String gbdatum = "1981-03-14";
+        Reiziger sietske = new Reiziger( "S", "", "Boers", Date.valueOf(gbdatum));
+        sietske.setId(67);
+        ovChipkaartList.add(new OVChipkaart(21, Date.valueOf(gbdatum), 03,32.5, sietske )) ;
+        Product product1 =new Product("gratis", "reis gratis met het ov", 12);
+        product1.setProduct_nummer(267);
+        product1.setOvChipkaarten(ovChipkaartList);
+        productDAO.save(product1);
+        for (Product product : productDAO.findAll()){
+            System.out.println(product);
+        }
+        System.out.println();
+        System.out.println("[Test] Product update:");
+        Product product2 =new Product("niet gratis", "reis gratis met het ov", 17);
+        product2.setProduct_nummer(267);
+        product2.setOvChipkaarten(ovChipkaartList);
+        productDAO.update(product2);
+        for (Product product : productDAO.findAll()){
+            System.out.println(product);
+        }
+        System.out.println();
+        System.out.println("[Test] Product find by ovchipkaart:");
+        System.out.println(productDAO.findByOVchipkaart(new OVChipkaart(21, Date.valueOf(gbdatum), 03,32.5, sietske )));
+        System.out.println();
+        System.out.println("[Test] Product delete:");
+        productDAO.delete(product2);
+        for (Product product : productDAO.findAll()){
+            System.out.println(product);
+        }
     }
 }

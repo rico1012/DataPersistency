@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface OVChipkaartDAO {
 
-    boolean save(OVChipkaart ovChipkaart);
+    boolean save(OVChipkaart ovChipkaart) throws SQLException;
 
     boolean update(OVChipkaart ovChipkaart);
 

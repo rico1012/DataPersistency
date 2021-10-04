@@ -13,12 +13,11 @@ public class ProductDAOsql implements ProductDAO{
         this.connection = connection;
     }
 
-    public boolean productSave(Product product) throws SQLException {
+    public boolean save(Product product) throws SQLException {
         try{
             String query;
             query = "INSERT INTO product (product_nummer, naam, beschrijving, prijs) " +
                     "VALUES (?,?,?,?)";
-            System.out.println("");
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, product.getProduct_nummer());
             pst.setString(2, product.getNaam());
@@ -26,44 +25,45 @@ public class ProductDAOsql implements ProductDAO{
             pst.setDouble(4, product.getPrijs());
             ResultSet rs = pst.executeQuery();
             rs.close();
+
             return true;
         }catch (SQLException e){
             OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(connection);
             for (OVChipkaart ovChipkaart: product.getOvChipkaarten()){
-                ovChipkaartDAO.save(ovChipkaart);
-                String query = "INSERT INTO ov_chipkaart_product (kaart_nummer,product_nummer, status, last_update) " +
-                        "VALUES (?,?,?,?)";
-                PreparedStatement pst = connection.prepareStatement(query);
-                pst.setInt(1, ovChipkaart.getKaartNummer());
-                pst.setInt(2, product.getProduct_nummer());
-                pst.setString(3, "placed");
-                pst.setDate(4, (Date) Calendar.getInstance().getTime());
-                ResultSet rs = pst.executeQuery();
-                rs.close();
+                if (!ovChipkaartDAO.findAll().contains(ovChipkaart)){
+                    ovChipkaartDAO.save(ovChipkaart);
+                }
+                System.out.println("test");
+                PreparedStatement pst2 = connection.prepareStatement("INSERT INTO ov_chipkaart_product (kaart_nummer,product_nummer, status, last_update) " +
+                        "VALUES (?,?,?,?)");
+                pst2.setInt(1, ovChipkaart.getKaartNummer());
+                pst2.setInt(2, product.getProduct_nummer());
+                pst2.setString(3, "actief");
+                pst2.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+                pst2.executeUpdate();
             }
-            System.out.println(e);
             return false;
         }
     }
 
 
-    public boolean productUpdate(Product product) throws SQLException {
+    public boolean update(Product product) throws SQLException {
         OVChipkaartDAO ovChipkaartDAO= new OVChipkaartDAOsql(connection);
         try{
             String query;
-            query = "UPDATE product SET product_nummer=? , naam=?, beschrijving=?, prijs=? WHERE product_nummer=?";
+            query = "UPDATE product SET naam=?, beschrijving=?, prijs=?::numeric WHERE product_nummer=?";
             System.out.println("");
             PreparedStatement pst = connection.prepareStatement(query);
-            pst.setInt(1, product.getProduct_nummer());
-            pst.setString(2, product.getNaam());
-            pst.setString(3, product.getBeschrijving());
-            pst.setDouble(4, product.getPrijs());
+            pst.setInt(4, product.getProduct_nummer());
+            pst.setString(1, product.getNaam());
+            pst.setString(2, product.getBeschrijving());
+            pst.setDouble(3, product.getPrijs());
             ResultSet rs = pst.executeQuery();
             rs.close();
             return true;
         }catch (SQLException e){
             List<OVChipkaart> ovChipkaartList = new ArrayList<>(product.getOvChipkaarten());
-            String query = "SELECT kaart_nummer AS kn FROM ov_chipkaar_product WHERE product.nummer=?";
+            String query = "SELECT kaart_nummer AS kn FROM ov_chipkaart_product WHERE product_nummer=?";
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, product.getProduct_nummer());
             ResultSet rs = pst.executeQuery();
@@ -79,54 +79,46 @@ public class ProductDAOsql implements ProductDAO{
             List<OVChipkaart> ovChipkaartList2 = new ArrayList<>(ovChipkaarts);
             ovChipkaartList2.remove(ovChipkaartList);
             for (OVChipkaart ovChipkaart : ovChipkaartList2){
-                ovChipkaartDAO.delete(ovChipkaart);
+                PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM ov_chipkaart_product WHERE kaart_nummer=? AND product_nummer=?");
+                preparedStatement.setInt(1, ovChipkaart.getKaartNummer());
+                preparedStatement.setInt(2, product.getProduct_nummer());
+                preparedStatement.executeUpdate();
             }
             ovChipkaartList.remove(ovChipkaarts);
             for (OVChipkaart ovChipkaart : ovChipkaartList){
-                ovChipkaartDAO.save(ovChipkaart);
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO ov_chipkaart_product (kaart_nummer,product_nummer, status, last_update) VALUES (?,?,?,?)");
+                preparedStatement.setInt(1, ovChipkaart.getKaartNummer());
+                preparedStatement.setInt(2, product.getProduct_nummer());
+                preparedStatement.setString(3, "actief");
+                preparedStatement.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+                preparedStatement.executeUpdate();
             }
-
-
-
-
             rs.close();
-
             System.out.println(e);
             return false;
         }
     }
 
 
-    public boolean productDelete(Product product) throws SQLException {
+    public boolean delete(Product product) throws SQLException {
         try{
-            String query;
-            query = "DELETE FROM product WHERE product_nummer=? AND naam=? AND beschrijving=? AND prijs=?";
-            System.out.println("");
-            PreparedStatement pst = connection.prepareStatement(query);
-            pst.setInt(1, product.getProduct_nummer());
-            pst.setString(2, product.getNaam());
-            pst.setString(3, product.getBeschrijving());
-            pst.setDouble(4, product.getPrijs());
-            ResultSet rs = pst.executeQuery();
-            rs.close();
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM ov_chipkaart_product WHERE product_nummer=?");
+            preparedStatement.setInt(1, product.getProduct_nummer());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.close();
+
             return true;
         }catch (SQLException e){
-            System.out.println(e);
-            OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(connection);
-            for (OVChipkaart ovChipkaart: product.getOvChipkaarten()){
-                ovChipkaartDAO.save(ovChipkaart);
-                String  query = "DELETE FROM ov_chipkaart_porduct WHERE kaart_nummer=? AND product_nummer=?";
-                PreparedStatement pst = connection.prepareStatement(query);
-                pst.setInt(1, ovChipkaart.getKaartNummer());
-                pst.setInt(2, product.getProduct_nummer());
-                ResultSet rs = pst.executeQuery();
-                rs.close();
-            }
+            String query;
+            query = "DELETE FROM product WHERE product_nummer=?";
+            PreparedStatement pst = connection.prepareStatement(query);
+            pst.setInt(1, product.getProduct_nummer());
+            pst.executeUpdate();
             return false;
         }
     }
     public List<Product> findByOVchipkaart(OVChipkaart ovChipkaart) throws SQLException {
-        String query = "SELECT product.product_nummer AS pn, product.naam AS nm, product.beschrijving AS bs, product.prijs AS ps FROM ov_chipkaart_product JOIN product ON ov_chipkaart.product_nummer = product.product_nummer WHERE ov_chipkaart_product = ?";
+        String query = "SELECT product.product_nummer AS pn, product.naam AS nm, product.beschrijving AS bs, product.prijs AS ps FROM ov_chipkaart_product JOIN product ON ov_chipkaart_product.product_nummer = product.product_nummer WHERE ov_chipkaart_product.kaart_nummer = ?";
         PreparedStatement pst = connection.prepareStatement(query);
         pst.setInt(1, ovChipkaart.getKaartNummer());
         ResultSet rs = pst.executeQuery();
@@ -142,13 +134,13 @@ public class ProductDAOsql implements ProductDAO{
         }
         OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOsql(connection);
         for (Product product: producten){
-            String query2 = "SELECT kaart_nummer AS kn FROM ov_chipkaar_product WHERE product.nummer=?";
+            String query2 = "SELECT kaart_nummer FROM ov_chipkaart_product WHERE product_nummer=?";
             PreparedStatement pst2 = connection.prepareStatement(query2);
             pst2.setInt(1, product.getProduct_nummer());
-            ResultSet rs2 = pst.executeQuery();
+            ResultSet rs2 = pst2.executeQuery();
             List<OVChipkaart> ovChipkaarts = new ArrayList<>();
             while (rs2.next()) {
-                String kn = rs2.getString("kn");
+                String kn = rs2.getString("kaart_nummer");
                 for (OVChipkaart ovChipkaart2: ovChipkaartDAO.findAll()){
                     if (ovChipkaart2.getKaartNummer()==Integer.parseInt(kn)){
                         ovChipkaarts.add(ovChipkaart2);
