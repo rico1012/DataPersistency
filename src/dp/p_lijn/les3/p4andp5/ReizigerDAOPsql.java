@@ -9,7 +9,6 @@ import java.util.List;
 public class ReizigerDAOPsql implements ReizigerDAO {
     private Connection conn;
 
-    private AdresDAO adao;
 
     public ReizigerDAOPsql(Connection conn) {
         this.conn = conn;
@@ -36,7 +35,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             for (OVChipkaart ovChipkaart: reiziger.getOvChipkaartList()){
                 ovChipkaartDAO.save(ovChipkaart);
             }
-            System.out.println(e);
             return false;
         }
     }
@@ -90,9 +88,10 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             pst.setDate(5, (Date) reiziger.getGeboortedatum());
             ResultSet rs = pst.executeQuery();
             rs.close();
+            AdresDAO adresDAO = new AdresDAOsql(conn);
+            adresDAO.delete(reiziger.getAdres());
             return true;
         }catch (SQLException e){
-            System.out.println(e);
 
             return false;
         }

@@ -33,7 +33,6 @@ public class ProductDAOsql implements ProductDAO{
                 if (!ovChipkaartDAO.findAll().contains(ovChipkaart)){
                     ovChipkaartDAO.save(ovChipkaart);
                 }
-                System.out.println("test");
                 PreparedStatement pst2 = connection.prepareStatement("INSERT INTO ov_chipkaart_product (kaart_nummer,product_nummer, status, last_update) " +
                         "VALUES (?,?,?,?)");
                 pst2.setInt(1, ovChipkaart.getKaartNummer());
@@ -94,7 +93,6 @@ public class ProductDAOsql implements ProductDAO{
                 preparedStatement.executeUpdate();
             }
             rs.close();
-            System.out.println(e);
             return false;
         }
     }

@@ -39,7 +39,10 @@ public class Main {
 
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException, ParseException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
-
+        String gbdatum = "1981-03-14";
+        Reiziger sietske = new Reiziger( "S", "", "Boers", Date.valueOf(gbdatum));
+        sietske.setId(77);
+        rdao.delete(sietske);
         // Haal alle reizigers op uit de database
         List<Reiziger> reizigers = rdao.findAll();
         System.out.println("[Test] ReizigerDAO.findAll() geeft de volgende reizigers:");
@@ -49,9 +52,8 @@ public class Main {
         System.out.println();
 
         // Maak een nieuwe reiziger aan en persisteer deze in de database
-        String gbdatum = "1981-03-14";
-        Reiziger sietske = new Reiziger( "S", "", "Boers", Date.valueOf(gbdatum));
-        sietske.setId(77);
+
+
         System.out.print("[Test] Eerst " + reizigers.size() + " reizigers, na ReizigerDAO.save() ");
 //        System.out.println(sietske);
         rdao.save(sietske);
@@ -61,7 +63,7 @@ public class Main {
 
         // Voeg aanvullende tests van de ontbrekende CRUD-operaties in.
         Reiziger reiziger = new Reiziger("R", "", "Vossestein", Date.valueOf(gbdatum));
-        reiziger.setId(89);
+        reiziger.setId(167);
 //        for (int i = 0; i < 1000; i++) {
 //            OVChipkaart ovChipkaart = new OVChipkaart(1000+i,Date.valueOf(gbdatum), 2, 60,reiziger);
 //            reiziger.getOvChipkaartList().add(ovChipkaart);
@@ -72,9 +74,6 @@ public class Main {
 //        rdao.update(reiziger);
         System.out.println(reiziger.getOvChipkaartList().size());
         rdao.delete(reiziger);
-
-
-
     }
 
     private static void testAdresDAO(AdresDAO adao) throws SQLException {

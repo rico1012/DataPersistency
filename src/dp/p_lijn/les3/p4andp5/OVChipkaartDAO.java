@@ -8,9 +8,9 @@ public interface OVChipkaartDAO {
 
     boolean save(OVChipkaart ovChipkaart) throws SQLException;
 
-    boolean update(OVChipkaart ovChipkaart);
+    boolean update(OVChipkaart ovChipkaart) throws SQLException;
 
-    boolean delete(OVChipkaart ovChipkaart);
+    boolean delete(OVChipkaart ovChipkaart) throws SQLException;
 
     List<OVChipkaart> findByReiziger(Reiziger reiziger) throws SQLException, ParseException;
 
