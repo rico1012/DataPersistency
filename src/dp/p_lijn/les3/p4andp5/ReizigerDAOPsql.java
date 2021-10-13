@@ -16,7 +16,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
 
     @Override
-    public boolean save(Reiziger reiziger) throws SQLException {
+    public boolean save(Reiziger reiziger) throws SQLException, ParseException {
         try{
             String query;
             query = "INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum) " +

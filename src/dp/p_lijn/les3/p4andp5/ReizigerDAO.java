@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ReizigerDAO {
 
-    boolean save(Reiziger reiziger) throws SQLException;
+    boolean save(Reiziger reiziger) throws SQLException, ParseException;
 
     boolean update(Reiziger reiziger) throws SQLException, ParseException;
 

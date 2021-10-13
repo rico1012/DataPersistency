@@ -16,7 +16,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     }
 
     @Override
-    public boolean save(OVChipkaart ovChipkaart) throws SQLException {
+    public boolean save(OVChipkaart ovChipkaart) throws SQLException, ParseException {
         try{
             String query;
             query = "INSERT INTO ov_chipkaart (kaart_nummer , geldig_tot , klasse , saldo , reiziger_id ) " +
@@ -47,7 +47,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
                 }
             }
             return true;
-        }catch (SQLException e){
+        }catch (SQLException | ParseException e){
             ProductDAO productDAO = new ProductDAOsql(connection);
             for (Product product: ovChipkaart.getProducten()){
                 if (!productDAO.findAll().contains(product)){
@@ -66,7 +66,7 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     }
 
     @Override
-    public boolean update(OVChipkaart ovChipkaart) throws SQLException {
+    public boolean update(OVChipkaart ovChipkaart) throws SQLException, ParseException {
         try {
             String query;
             query = "UPDATE ov_chipkaart SET reiziger_id=? , geldig_tot=?, klasse=?, saldo=? WHERE kaart_nummer=?";
@@ -169,6 +169,54 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
     }
 
     @Override
+    public OVChipkaart findById(int id) throws SQLException, ParseException {
+        String query = "SELECT kaart_nummer AS kaartNummer, geldig_tot AS geldigTot, klasse AS klasse, saldo AS saldo, reiziger_id AS reizigerId FROM ov_chipkaart WHERE kaart_nummer=?";
+        PreparedStatement pst = connection.prepareStatement(query);
+        pst.setInt(1, id);
+        String kaartNummer;
+        String geldigTot;
+        String klasse;
+        String saldo;
+        String reizigerId;
+        List<OVChipkaart> ovChipkaartList= new ArrayList<>();
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()){
+            kaartNummer = rs.getString("kaartNummer");
+            geldigTot = rs.getString("geldigTot");
+            klasse = rs.getString("klasse");
+            saldo = rs.getString("saldo");
+            reizigerId = rs.getString("reizigerId");
+            Date date = new SimpleDateFormat("MM-dd-yyyy").parse(geldigTot);
+            Reiziger reiziger = null;
+            List<Reiziger> reizigers = new ReizigerDAOPsql(connection).findAll();
+            for (Reiziger reiziger1 : reizigers){
+                if (reiziger1.getId()==Integer.parseInt(reizigerId)){
+                    reiziger=reiziger1;
+                }
+            }
+            OVChipkaart ovChipkaart = new OVChipkaart(Integer.parseInt(kaartNummer), date,Integer.parseInt(klasse), Double.parseDouble(saldo), reiziger);ovChipkaartList.add(ovChipkaart);
+
+            for (Reiziger reiziger1 : reizigers){
+                if (reiziger1.getId()==Integer.parseInt(reizigerId)){
+                    if (reiziger1.getOvChipkaartList()==null){
+                        reiziger.setOvChipkaartList(new ArrayList<>());
+                    }
+                    reiziger1.getOvChipkaartList().add(ovChipkaart);
+                }
+            }
+            rs.close();
+            ProductDAO productDAO = new ProductDAOsql(connection);
+
+            List<Product> products = productDAO.findByOVchipkaart(ovChipkaart);
+            ovChipkaart.setProducten(products);
+            return ovChipkaart;
+        }
+
+        rs.close();
+        return null;
+    }
+
+    @Override
     public List<OVChipkaart> findAll() {
         try{
             Statement sta = connection.createStatement();
@@ -207,7 +255,11 @@ public class OVChipkaartDAOsql implements OVChipkaartDAO{
                 }
             }
             rs.close();
-            sta.close();
+            ProductDAO productDAO = new ProductDAOsql(connection);
+            for (OVChipkaart ovChipkaart: ovChipkaartList){
+                List<Product> products = productDAO.findByOVchipkaart(ovChipkaart);
+                ovChipkaart.setProducten(products);
+            }
             return ovChipkaartList;
         } catch (SQLException | ParseException throwables) {
             throwables.printStackTrace();

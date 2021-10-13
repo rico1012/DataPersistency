@@ -6,13 +6,15 @@ import java.util.List;
 
 public interface OVChipkaartDAO {
 
-    boolean save(OVChipkaart ovChipkaart) throws SQLException;
+    boolean save(OVChipkaart ovChipkaart) throws SQLException, ParseException;
 
-    boolean update(OVChipkaart ovChipkaart) throws SQLException;
+    boolean update(OVChipkaart ovChipkaart) throws SQLException, ParseException;
 
     boolean delete(OVChipkaart ovChipkaart) throws SQLException;
 
     List<OVChipkaart> findByReiziger(Reiziger reiziger) throws SQLException, ParseException;
+
+    OVChipkaart findById(int id) throws SQLException, ParseException;
 
     List<OVChipkaart> findAll();
 }

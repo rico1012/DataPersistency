@@ -71,12 +71,17 @@ public class OVChipkaart {
 
     @Override
     public String toString() {
+        List<Integer> nmr = new ArrayList<>();
+        for (Product product : this.producten){
+            nmr.add(product.getProduct_nummer());
+        }
         return "OVChipkaart{" +
                 "kaartNummer=" + kaartNummer +
                 ", geldigTot=" + geldigTot +
                 ", klasse=" + klasse +
                 ", saldo=" + saldo +
                 ", reiziger=" + reiziger.getId() +
+                ", producten" + nmr +
                 '}';
     }
 }

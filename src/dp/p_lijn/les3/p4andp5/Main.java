@@ -169,7 +169,7 @@ public class Main {
         }
     }
 
-    private static void testProductDOA(ProductDAO productDAO) throws SQLException {
+    private static void testProductDOA(ProductDAO productDAO) throws SQLException, ParseException {
         System.out.println();
         System.out.println("\n--------- Test ProductDAO ------------");
         System.out.println();

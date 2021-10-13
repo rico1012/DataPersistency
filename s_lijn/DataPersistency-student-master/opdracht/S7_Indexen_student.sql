@@ -25,6 +25,12 @@
 --    Kopieer het explain plan onderaan de opdracht
 -- 4. Verklaar de verschillen. Schrijf deze hieronder op.
 
+--EXPLAIN SELECT * FROM order_lines WHERE stock_item_id = 9;
+--CREATE INDEX ord_lines_si_id_idx ON order_lines (stock_item_id);
+--drop index ord_lines_si_id_idx
+
+-- er word een bitmap index scan uitgevoerd bij een index
+
 
 -- S7.2.
 --
@@ -37,6 +43,26 @@
 -- 5. Analyseer met EXPLAIN en kopieer het explain plan onder de opdracht
 -- 6. Verklaar de verschillen en schrijf hieronder op
 
+--"Index Scan using pk_sales_orders on orders  (cost=0.29..8.31 rows=1 width=155)"
+--"  Index Cond: (order_id = 73590)"
+
+--"Seq Scan on orders  (cost=0.00..1819.94 rows=107 width=155)"
+--"  Filter: (customer_id = 1028)"
+
+-- de een is een index scan en de ander een sequence scan
+
+-- CREATE INDEX orders_costumer
+-- ON orders(customer_id);
+
+-- EXPLAIN SELECT * FROM orders where order_id=73590
+-- EXPLAIN SELECT * FROM orders where customer_id=1028
+
+--"Bitmap Heap Scan on orders  (cost=5.12..308.96 rows=107 width=155)"
+--"  Recheck Cond: (customer_id = 1028)"
+--"  ->  Bitmap Index Scan on orders_costumer  (cost=0.00..5.10 rows=107 width=0)"
+--"        Index Cond: (customer_id = 1028)"
+
+--er word nu een bitmap heap scan gedaan
 
 -- S7.3.A
 --
@@ -56,7 +82,11 @@
 -- Maak om dit te bereiken een subquery in je WHERE clause.
 -- Sorteer het resultaat van de hele geheel op levertijd (desc) en verkoper.
 -- 1. Maak hieronder deze query (als je het goed doet zouden er 377 rijen uit moeten komen, en het kan best even duren...)
-
+SELECT orders.order_id, orders.order_date, orders.salesperson_person_id as verkoper , (orders.expected_delivery_date - orders.order_date) as levertijd, order_lines.quantity
+FROM orders 
+JOIN order_lines ON order_lines.order_id = orders.order_id 
+WHERE (orders.expected_delivery_date - orders.order_date)>1.45 AND order_lines.quantity>250
+ORDER BY orders.salesperson_person_id,(orders.expected_delivery_date - orders.order_date)
 
 -- S7.3.B
 --
@@ -64,11 +94,35 @@
 -- 2. Kijk of je met 1 of meer indexen de query zou kunnen versnellen
 -- 3. Maak de index(en) aan en run nogmaals het EXPLAIN plan (kopieer weer onder de opdracht) 
 -- 4. Wat voor verschillen zie je? Verklaar hieronder.
+EXPLAIN SELECT orders.order_id, orders.order_date, orders.salesperson_person_id as verkoper , (orders.expected_delivery_date - orders.order_date) as levertijd, order_lines.quantity
+FROM orders 
+JOIN order_lines ON order_lines.order_id = orders.order_id 
+WHERE (orders.expected_delivery_date - orders.order_date)>1.45 AND order_lines.quantity>250
+ORDER BY orders.salesperson_person_id,(orders.expected_delivery_date - orders.order_date);
+
+-- CREATE INDEX onder_linde_quantity
+-- ON order_lines(quantity);
+
+-- CREATE INDEX onder_orders_date
+-- ON orders(order_date);
+
+
+
+-- CREATE INDEX orders_expected_delivery_date
+-- ON orders(order_date);
+
+-- er worden veel hashes gebruikt en een bitmap heat scan
 
 
 
 -- S7.3.C
 --
 -- Zou je de query ook heel anders kunnen schrijven om hem te versnellen?
+EXPLAIN SELECT orders.order_id, orders.order_date, orders.salesperson_person_id as verkoper , (orders.expected_delivery_date - orders.order_date) as levertijd, order_lines.quantity
+FROM orders 
+JOIN order_lines ON order_lines.order_id = orders.order_id AND order_lines.quantity>250 AND (orders.expected_delivery_date - orders.order_date)>1.45
+ORDER BY orders.salesperson_person_id,(orders.expected_delivery_date - orders.order_date);
+
+-- ik heb dit geprobeert maar lijkt geen verschil te hebben
 
 

@@ -14,20 +14,21 @@ public class AdresDAOsql implements AdresDAO {
     @Override
     public boolean save(Adres adres) {try{
         String query;
-        query = "INSERT INTO adres (adres_id, postcode, huisnummer, straat, woonplaats, reiziger_id) " +
-                "VALUES (?,?,?,?,?,?)";
+        query = "INSERT INTO adres (gen_random_uuid(), postcode, huisnummer, straat, woonplaats, reiziger_id) " +
+                "VALUES (?,?,?,?,?)";
         System.out.println("");
         PreparedStatement pst = conn.prepareStatement(query);
-        pst.setInt(1, adres.getId());
-        pst.setString(2, adres.getPostcode());
-        pst.setString(3, adres.getHuisnummer());
-        pst.setString(4, adres.getStraat());
-        pst.setString(5, adres.getWoonplaats());
-        pst.setInt(6, adres.getReiziger_id());
+
+        pst.setString(1, adres.getPostcode());
+        pst.setString(2, adres.getHuisnummer());
+        pst.setString(3, adres.getStraat());
+        pst.setString(4, adres.getWoonplaats());
+        pst.setInt(5, adres.getReiziger_id());
         ResultSet rs = pst.executeQuery();
         rs.close();
         return true;
     }catch (SQLException e){
+        System.out.println(e);
         return false;
     }
     }
